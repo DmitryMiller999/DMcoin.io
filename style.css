@@ -1,0 +1,64 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.game {
+    text-align: center;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #45a049;
+}
+/* ... предыдущие стили ... */
+
+.upgrades {
+    margin-top: 20px;
+    text-align: left;
+}
+
+.upgrades button {
+    display: block;
+    margin: 5px 0;
+    background: #3498db;
+}
+
+.upgrades button:hover {
+    background: #2980b9;
+}
+
+.achievements {
+    margin-top: 20px;
+    text-align: left;
+}
+
+.achievements ul {
+    list-style: none;
+    padding: 0;
+}
+
+.achievements li {
+    padding: 5px;
+    background: #f8f8f8;
+    margin: 3px 0;
+    border-left: 3px solid #e74c3c;
+}

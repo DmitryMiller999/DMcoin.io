@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DMcoin Арсенал</title>
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --secondary: #a29bfe;
+            --accent: #fd79a8;
+            --coin: #fdcb6e;
+            --dark: #2d3436;
+            --light: #f5f6fa;
+            --reset: #e17055;
+            --text-dark: #2d3436;
+            --tab-active: #00b894;
+            --tab-inactive: #636e72;
+            --upgrade: #55efc4;
+            --dev: #74b9ff;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--primary), var(--dark));
+            color: var(--light);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            background-color: rgba(45, 52, 54, 0.8);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 95%;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        h1 {
+            color: var(--accent);
+            font-size: 2.2rem;
+            margin-bottom: 15px;
+            text-align: center;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(90deg, #fd79a8, #fdcb6e);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .stat-box {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 12px;
+            min-width: 120px;
+            flex-grow: 1;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-box:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .stat-title {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin: 3px 0;
+        }
+        
+        .clicks .stat-value {
+            color: var(--light);
+        }
+        
+        .coins .stat-value {
+            color: var(--coin);
+        }
+        
+        .click-btn {
+            width: 150px;
+            height: 150px;
+            margin: 15px auto;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), #e84393);
+            color: white;
+            font-size: 1.3rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 5px 15px rgba(253, 121, 168, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .click-btn::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                rgba(255, 255, 255, 0.3),
+                rgba(255, 255, 255, 0)
+            );
+            transform: rotate(45deg);
+            transition: all 0.5s;
+        }
+        
+        .click-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(253, 121, 168, 0.6);
+        }
+        
+        .click-btn:hover::before {
+            left: 100%;
+            top: 100%;
+        }
+        
+        .click-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--secondary);
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        
+        .tabs::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            background: var(--tab-inactive);
+            color: white;
+            border: none;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+            transition: all 0.2s;
+            font-weight: bold;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        
+        .tab.active {
+            background: var(--tab-active);
+            box-shadow: 0 2px 5px rgba(0, 184, 148, 0.3);
+        }
+        
+        .tab-content {
+            display: none;
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 10px 5px;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .shop-section {
+            margin-bottom: 20px;
+        }
+        
+        .shop-section h3 {
+            margin-bottom: 10px;
+            color: var(--accent);
+            padding-bottom: 5px;
+            border-bottom: 1px solid var(--secondary);
+        }
+        
+        .weapons-grid, .upgrades-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 10px;
+        }
+        
+        .weapon-card, .upgrade-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 10px;
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .weapon-card:hover, .upgrade-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .weapon-name, .upgrade-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .weapon-owned, .upgrade-owned {
+            color: var(--secondary);
+            font-size: 0.8rem;
+        }
+        
+        .weapon-price, .upgrade-price {
+            color: var(--coin);
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+        
+        .upgrade-effect {
+            color: var(--upgrade);
+            font-size: 0.8rem;
+            margin-bottom: 8px;
+        }
+        
+        .buy-btn {
+            background: var(--coin);
+            color: var(--text-dark);
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+            width: 100%;
+            font-size: 0.9rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .buy-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to right,
+                rgba(255, 255, 255, 0.3),
+                rgba(255, 255, 255, 0)
+            );
+            transform: translateX(-100%);
+            transition: transform 0.5s;
+        }
+        
+        .buy-btn:hover {
+            background: #ffeaa7;
+        }
+        
+        .buy-btn:hover::after {
+            transform: translateX(100%);
+        }
+        
+        .buy-btn:disabled {
+            background: #636e72;
+            cursor: not-allowed;
+            color: var(--light);
+        }
+        
+        .reset-section {
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .reset-btn {
+            background: var(--reset);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .reset-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to right,
+                rgba(255, 255, 255, 0.3),
+                rgba(255, 255, 255, 0)
+            );
+            transform: translateX(-100%);
+            transition: transform 0.5s;
+        }
+        
+        .reset-btn:hover {
+            background: #d63031;
+        }
+        
+        .reset-btn:hover::after {
+            transform: translateX(100%);
+        }
+        
+        .reset-confirm {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .confirm-btn {
+            padding: 5px 12px;
+            margin: 0 5px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        
+        .confirm-yes {
+            background: var(--reset);
+            color: white;
+        }
+        
+        .confirm-yes:hover {
+            background: #d63031;
+        }
+        
+        .confirm-no {
+            background: var(--secondary);
+            color: var(--text-dark);
+        }
+        
+        .confirm-no:hover {
+            background: #8179fe;
+        }
+        
+        /* Стили для скроллбара */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #e84393;
+        }
+        
+        .exchange-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .click-multiplier {
+            text-align: center;
+            margin: 10px 0;
+            font-size: 1.1rem;
+            color: var(--upgrade);
+            background: rgba(85, 239, 196, 0.1);
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid rgba(85, 239, 196, 0.3);
+        }
+        
+        .dev-card {
+            background: rgba(116, 185, 255, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(116, 185, 255, 0.3);
+            text-align: center;
+        }
+        
+        .dev-title {
+            color: var(--dev);
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .dev-description {
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .youtube-link {
+            display: inline-block;
+            background: #ff0000;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+        
+        .youtube-link:hover {
+            background: #cc0000;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(255, 0, 0, 0.3);
+        }
+        
+        .youtube-link i {
+            margin-right: 5px;
+        }
+        
+        .version {
+            text-align: center;
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin-top: 10px;
+        }
+        
+        /* Анимация монетки при клике */
+        @keyframes coinBounce {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+        
+        .coin-animation {
+            animation: coinBounce 0.3s ease;
+        }
+        
+        /* Анимация клика */
+        .click-effect {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            animation: clickAnimation 0.5s ease-out;
+        }
+        
+        @keyframes clickAnimation {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(3); opacity: 0; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1>✨ DMcoin Арсенал ✨</h1>
+        
+        <div class="stats">
+            <div class="stat-box clicks">
+                <div class="stat-title">Клики</div>
+                <div class="stat-value" id="clicks">0</div>
+            </div>
+            
+            <div class="stat-box coins">
+                <div class="stat-title">DMcoins</div>
+                <div class="stat-value" id="coins">0</div>
+            </div>
+        </div>
+        
+        <div class="click-multiplier">
+            Множитель кликов: <span id="clickMultiplier">1</span>x
+        </div>
+        
+        <button class="click-btn" id="clickBtn">КЛИКНИ!</button>
+        
+        <div class="tabs">
+            <button class="tab active" data-tab="exchange">Обмен</button>
+            <button class="tab" data-tab="upgrades">Улучшения</button>
+            <button class="tab" data-tab="weapons">Арсенал</button>
+            <button class="tab" data-tab="developers">Разработчики</button>
+        </div>
+        
+        <div class="tab-content active" id="exchange-tab">
+            <div class="exchange-item">
+                <h3>Обмен кликов</h3>
+                <p>10 DMcoins за 100 кликов</p>
+                <button class="buy-btn" id="buyCoinsBtn">Купить</button>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="upgrades-tab">
+            <div class="upgrades-grid" id="upgradesContainer">
+                <!-- Улучшения будут добавляться сюда -->
+            </div>
+        </div>
+        
+        <div class="tab-content" id="weapons-tab">
+            <div class="weapons-grid" id="weaponsContainer">
+                <!-- Оружие будет добавляться сюда -->
+            </div>
+        </div>
+        
+        <div class="tab-content" id="developers-tab">
+            <div class="dev-card">
+                <div class="dev-title">О разработчике</div>
+                <div class="dev-description">
+                    Эта игра была создана с любовью и страстью к инкрементальным играм. 
+                    Надеюсь, вам понравится играть в неё так же, как мне понравилось её создавать!
+                </div>
+                <a href="https://www.youtube.com/@NyxDM" class="youtube-link" target="_blank">
+                    <i class="fab fa-youtube"></i> Мой YouTube
+                </a>
+            </div>
+            
+            <div class="version">
+                Версия 1.0.0
+            </div>
+        </div>
+        
+        <div class="reset-section">
+            <button class="reset-btn" id="resetBtn">Сбросить прогресс</button>
+            <div class="reset-confirm" id="resetConfirm">
+                <p>Вы уверены, что хотите сбросить весь прогресс?</p>
+                <button class="confirm-btn confirm-yes" id="confirmYes">Да</button>
+                <button class="confirm-btn confirm-no" id="confirmNo">Нет</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Инициализация переменных
+            let clicks = 0;
+            let coins = 0;
+            let clickMultiplier = 1;
+            const COIN_PRICE = 100; // 100 кликов = 10 DMcoins
+            
+            // Список оружия (50 видов)
+            const weapons = [
+                { id: 1, name: "Пистолет", basePrice: 20 },
+                { id: 2, name: "Револьвер", basePrice: 60 },
+                { id: 3, name: "ПП", basePrice: 180 },
+                { id: 4, name: "Дробовик", basePrice: 540 },
+                { id: 5, name: "Винтовка", basePrice: 1600 },
+                { id: 6, name: "Снайперка", basePrice: 4800 },
+                { id: 7, name: "Гранатомёт", basePrice: 14400 },
+                { id: 8, name: "Огнемёт", basePrice: 43200 },
+                { id: 9, name: "Миниган", basePrice: 130000 },
+                { id: 10, name: "РПГ", basePrice: 390000 },
+                { id: 11, name: "Лазерный пистолет", basePrice: 1170000 },
+                { id: 12, name: "Плазменная винтовка", basePrice: 3510000 },
+                { id: 13, name: "Гаусс-пушка", basePrice: 10530000 },
+                { id: 14, name: "Рельсотрон", basePrice: 31590000 },
+                { id: 15, name: "Протонный ускоритель", basePrice: 94770000 },
+                { id: 16, name: "Квантовый деструктор", basePrice: 284310000 },
+                { id: 17, name: "Нейтронный излучатель", basePrice: 852930000 },
+                { id: 18, name: "Антиматериальная пушка", basePrice: 2558790000 },
+                { id: 19, name: "Чёрная дыра", basePrice: 7676370000 },
+                { id: 20, name: "Сингулярность", basePrice: 23029110000 },
+                { id: 21, name: "Гравитационная пушка", basePrice: 69087330000 },
+                { id: 22, name: "Тёмная энергия", basePrice: 207261990000 },
+                { id: 23, name: "Космический разлом", basePrice: 621785970000 },
+                { id: 24, name: "Вселенский коллапс", basePrice: 1865357910000 },
+                { id: 25, name: "Мультивселенная", basePrice: 5596073730000 },
+                { id: 26, name: "Божественный луч", basePrice: 16788221190000 },
+                { id: 27, name: "Создатель", basePrice: 50364663570000 },
+                { id: 28, name: "Абсолют", basePrice: 151093990710000 },
+                { id: 29, name: "Омега-пушка", basePrice: 453281972130000 },
+                { id: 30, name: "Альфа-разрушитель", basePrice: 1359845916390000 },
+                { id: 31, name: "Бесконечность", basePrice: 4079537749170000 },
+                { id: 32, name: "Вечность", basePrice: 12238613247510000 },
+                { id: 33, name: "Нирвана", basePrice: 36715839742530000 },
+                { id: 34, name: "Рай", basePrice: 110147519227590000 },
+                { id: 35, name: "Ад", basePrice: 330442557682770000 },
+                { id: 36, name: "Апокалипсис", basePrice: 991327673048310000 },
+                { id: 37, name: "Армагеддон", basePrice: 2973983019144930000 },
+                { id: 38, name: "Рагнарёк", basePrice: 8921949057434790000 },
+                { id: 39, name: "Большой взрыв", basePrice: 26765847172304370000 },
+                { id: 40, name: "Большой хлопок", basePrice: 80297541516913100000 },
+                { id: 41, name: "Конец времени", basePrice: 240892624550739000000 },
+                { id: 42, name: "Начало всего", basePrice: 722677873652217000000 },
+                { id: 43, name: "Судный день", basePrice: 2168033620956650000000 },
+                { id: 44, name: "Последний вздох", basePrice: 6504100862869950000000 },
+                { id: 45, name: "Конечная точка", basePrice: 19512302588609800000000 },
+                { id: 46, name: "Предел", basePrice: 58536907765829400000000 },
+                { id: 47, name: "Абсолютный ноль", basePrice: 175610723297488000000000 },
+                { id: 48, name: "Космический ужас", basePrice: 526832169892464000000000 },
+                { id: 49, name: "Безымянный ужас", basePrice: 1580496509677390000000000 },
+                { id: 50, name: "Последнее оружие", basePrice: 4741489529032170000000000 }
+            ];
+            
+            // Список улучшений
+            const upgrades = [
+                { id: 1, name: "Улучшенный палец", basePrice: 50, effect: 0.5, description: "+0.5x к множителю кликов" },
+                { id: 2, name: "Тренировка рук", basePrice: 200, effect: 1, description: "+1x к множителю кликов" },
+                { id: 3, name: "Энергетик", basePrice: 1000, effect: 3, description: "+3x к множителю кликов" },
+                { id: 4, name: "Кофеин", basePrice: 5000, effect: 5, description: "+5x к множителю кликов" },
+                { id: 5, name: "Стероиды", basePrice: 20000, effect: 10, description: "+10x к множителю кликов" },
+                { id: 6, name: "Кибер-рука", basePrice: 100000, effect: 25, description: "+25x к множителю кликов" },
+                { id: 7, name: "Наноботы", basePrice: 500000, effect: 50, description: "+50x к множителю кликов" },
+                { id: 8, name: "Квантовый ускоритель", basePrice: 2000000, effect: 100, description: "+100x к множителю кликов" },
+                { id: 9, name: "Божественная сила", basePrice: 10000000, effect: 250, description: "+250x к множителю кликов" },
+                { id: 10, name: "Абсолютная мощь", basePrice: 50000000, effect: 500, description: "+500x к множителю кликов" }
+            ];
+            
+            // Состояние владения оружием и улучшениями
+            const ownedWeapons = {};
+            const ownedUpgrades = {};
+            
+            // Получение элементов DOM
+            const clicksDisplay = document.getElementById('clicks');
+            const coinsDisplay = document.getElementById('coins');
+            const clickMultiplierDisplay = document.getElementById('clickMultiplier');
+            const clickBtn = document.getElementById('clickBtn');
+            const buyCoinsBtn = document.getElementById('buyCoinsBtn');
+            const weaponsContainer = document.getElementById('weaponsContainer');
+            const upgradesContainer = document.getElementById('upgradesContainer');
+            const resetBtn = document.getElementById('resetBtn');
+            const resetConfirm = document.getElementById('resetConfirm');
+            const confirmYes = document.getElementById('confirmYes');
+            const confirmNo = document.getElementById('confirmNo');
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            // Инициализация магазина оружия
+            function initWeaponsShop() {
+                weaponsContainer.innerHTML = '';
+                weapons.forEach(weapon => {
+                    const weaponCard = document.createElement('div');
+                    weaponCard.className = 'weapon-card';
+                    weaponCard.innerHTML = `
+                        <div class="weapon-name">
+                            ${weapon.name}
+                            ${ownedWeapons[weapon.id] ? '<span class="weapon-owned">(куплено)</span>' : ''}
+                        </div>
+                        <div class="weapon-price">Цена: ${formatNumber(weapon.basePrice)} DMcoins</div>
+                        <button class="buy-btn" 
+                                id="buyWeapon${weapon.id}" 
+                                ${ownedWeapons[weapon.id] ? 'disabled' : ''}>
+                            ${ownedWeapons[weapon.id] ? 'Куплено' : 'Купить'}
+                        </button>
+                    `;
+                    weaponsContainer.appendChild(weaponCard);
+                    
+                    // Добавляем обработчик покупки
+                    if (!ownedWeapons[weapon.id]) {
+                        document.getElementById(`buyWeapon${weapon.id}`).addEventListener('click', () => {
+                            buyWeapon(weapon);
+                        });
+                    }
+                });
+            }
+            
+            // Инициализация магазина улучшений
+            function initUpgradesShop() {
+                upgradesContainer.innerHTML = '';
+                upgrades.forEach(upgrade => {
+                    const upgradeCard = document.createElement('div');
+                    upgradeCard.className = 'upgrade-card';
+                    upgradeCard.innerHTML = `
+                        <div class="upgrade-name">
+                            ${upgrade.name}
+                            ${ownedUpgrades[upgrade.id] ? '<span class="upgrade-owned">(куплено)</span>' : ''}
+                        </div>
+                        <div class="upgrade-effect">${upgrade.description}</div>
+                        <div class="upgrade-price">Цена: ${formatNumber(upgrade.basePrice)} DMcoins</div>
+                        <button class="buy-btn" 
+                                id="buyUpgrade${upgrade.id}" 
+                                ${ownedUpgrades[upgrade.id] ? 'disabled' : ''}>
+                            ${ownedUpgrades[upgrade.id] ? 'Куплено' : 'Купить'}
+                        </button>
+                    `;
+                    upgradesContainer.appendChild(upgradeCard);
+                    
+                    // Добавляем обработчик покупки
+                    if (!ownedUpgrades[upgrade.id]) {
+                        document.getElementById(`buyUpgrade${upgrade.id}`).addEventListener('click', () => {
+                            buyUpgrade(upgrade);
+                        });
+                    }
+                });
+            }
+            
+            // Форматирование больших чисел
+            function formatNumber(num) {
+                if (num >= 1e6) {
+                    const units = ['M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc', 'No'];
+                    const unit = Math.floor((num.toFixed(0).length - 1) / 3);
+                    const value = num / Math.pow(10, unit * 3);
+                    return value.toFixed(2) + units[unit - 2];
+                }
+                return num.toLocaleString();
+            }
+            
+            // Покупка оружия
+            function buyWeapon(weapon) {
+                if (coins >= weapon.basePrice && !ownedWeapons[weapon.id]) {
+                    coins -= weapon.basePrice;
+                    ownedWeapons[weapon.id] = true;
+                    updateCoins();
+                    saveGame();
+                    initWeaponsShop();
+                    
+                    // Эффект при покупке
+                    const weaponElement = document.getElementById(`buyWeapon${weapon.id}`).parentElement;
+                    weaponElement.style.transform = 'scale(1.05)';
+                    weaponElement.style.boxShadow = '0 0 15px gold';
+                    setTimeout(() => {
+                        weaponElement.style.transform = 'scale(1)';
+                        weaponElement.style.boxShadow = 'none';
+                    }, 300);
+                    
+                    // Обновляем кнопку клика, если это первое оружие
+                    if (weapon.id === 1) {
+                        clickBtn.textContent = 'СТРЕЛЯЙ!';
+                    }
+                    
+                    // Анимация монетки
+                    coinsDisplay.classList.add('coin-animation');
+                    setTimeout(() => {
+                        coinsDisplay.classList.remove('coin-animation');
+                    }, 300);
+                    
+                    showNotification(`Поздравляем! Вы купили ${weapon.name}!`);
+                }
+            }
+            
+            // Покупка улучшения
+            function buyUpgrade(upgrade) {
+                if (coins >= upgrade.basePrice && !ownedUpgrades[upgrade.id]) {
+                    coins -= upgrade.basePrice;
+                    ownedUpgrades[upgrade.id] = true;
+                    clickMultiplier += upgrade.effect;
+                    updateCoins();
+                    updateClickMultiplier();
+                    saveGame();
+                    initUpgradesShop();
+                    
+                    // Эффект при покупке
+                    const upgradeElement = document.getElementById(`buyUpgrade${upgrade.id}`).parentElement;
+                    upgradeElement.style.transform = 'scale(1.05)';
+                    upgradeElement.style.boxShadow = '0 0 15px var(--upgrade)';
+                    setTimeout(() => {
+                        upgradeElement.style.transform = 'scale(1)';
+                        upgradeElement.style.boxShadow = 'none';
+                    }, 300);
+                    
+                    // Анимация множителя
+                    clickMultiplierDisplay.classList.add('coin-animation');
+                    setTimeout(() => {
+                        clickMultiplierDisplay.classList.remove('coin-animation');
+                    }, 300);
+                    
+                    showNotification(`Поздравляем! Вы купили ${upgrade.name}! Ваш множитель кликов увеличен!`);
+                }
+            }
+            
+            // Показать уведомление
+            function showNotification(message) {
+                const notification = document.createElement('div');
+                notification.className = 'notification';
+                notification.textContent = message;
+                notification.style.position = 'fixed';
+                notification.style.bottom = '20px';
+                notification.style.left = '50%';
+                notification.style.transform = 'translateX(-50%)';
+                notification.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+                notification.style.color = 'white';
+                notification.style.padding = '10px 20px';
+                notification.style.borderRadius = '5px';
+                notification.style.zIndex = '1000';
+                document.body.appendChild(notification);
+                
+                // Анимация появления/исчезновения
+                setTimeout(() => {
+                    notification.style.transition = 'opacity 0.5s';
+                    notification.style.opacity = '0';
+                }, 2500);
+                
+                // Удаление уведомления
+                setTimeout(() => {
+                    notification.remove();
+                }, 3000);
+            }
+            
+            // Обновление отображения кликов
+            function updateClicks() {
+                clicksDisplay.textContent = formatNumber(clicks);
+                updateBuyButtons();
+            }
+            
+            // Обновление отображения монет
+            function updateCoins() {
+                coinsDisplay.textContent = formatNumber(coins);
+                updateBuyButtons();
+            }
+            
+            // Обновление множителя кликов
+            function updateClickMultiplier() {
+                clickMultiplierDisplay.textContent = clickMultiplier;
+            }
+            
+            // Обновление состояния кнопок покупки
+            function updateBuyButtons() {
+                // Обновляем кнопку обмена кликов на монеты
+                buyCoinsBtn.disabled = clicks < COIN_PRICE;
+                
+                // Обновляем кнопки покупки оружия
+                weapons.forEach(weapon => {
+                    const btn = document.getElementById(`buyWeapon${weapon.id}`);
+                    if (btn) {
+                        btn.disabled = coins < weapon.basePrice || ownedWeapons[weapon.id];
+                    }
+                });
+                
+                // Обновляем кнопки покупки улучшений
+                upgrades.forEach(upgrade => {
+                    const btn = document.getElementById(`buyUpgrade${upgrade.id}`);
+                    if (btn) {
+                        btn.disabled = coins < upgrade.basePrice || ownedUpgrades[upgrade.id];
+                    }
+                });
+            }
+            
+            // Загрузка сохраненных данных
+            function loadGame() {
+                if (localStorage.getItem('clicks')) {
+                    clicks = parseInt(localStorage.getItem('clicks'));
+                    clicksDisplay.textContent = formatNumber(clicks);
+                }
+                if (localStorage.getItem('coins')) {
+                    coins = parseInt(localStorage.getItem('coins'));
+                    coinsDisplay.textContent = formatNumber(coins);
+                }
+                if (localStorage.getItem('clickMultiplier')) {
+                    clickMultiplier = parseFloat(localStorage.getItem('clickMultiplier'));
+                    clickMultiplierDisplay.textContent = clickMultiplier;
+                }
+                if (localStorage.getItem('ownedWeapons')) {
+                    const savedWeapons = JSON.parse(localStorage.getItem('ownedWeapons'));
+                    Object.keys(savedWeapons).forEach(key => {
+                        ownedWeapons[key] = savedWeapons[key];
+                    });
+                    
+                    // Если есть хотя бы одно оружие, меняем текст кнопки
+                    if (Object.keys(ownedWeapons).length > 0) {
+                        clickBtn.textContent = 'СТРЕЛЯЙ!';
+                    }
+                }
+                
+                // Загружаем улучшения из localStorage
+                if (localStorage.getItem('ownedUpgrades')) {
+                    try {
+                        const savedUpgrades = JSON.parse(localStorage.getItem('ownedUpgrades'));
+                        Object.keys(savedUpgrades).forEach(key => {
+                            ownedUpgrades[key] = savedUpgrades[key];
+                        });
+                    } catch (e) {
+                        console.error("Ошибка загрузки улучшений:", e);
+                    }
+                }
+            }
+            
+            // Сохранение игры в localStorage
+            function saveGame() {
+                localStorage.setItem('clicks', clicks);
+                localStorage.setItem('coins', coins);
+                localStorage.setItem('clickMultiplier', clickMultiplier);
+                localStorage.setItem('ownedWeapons', JSON.stringify(ownedWeapons));
+                localStorage.setItem('ownedUpgrades', JSON.stringify(ownedUpgrades));
+            }
+            
+            // Обработчик клика по кнопке
+            clickBtn.addEventListener('click', function(event) {
+                clicks += clickMultiplier;
+                updateClicks();
+                saveGame();
+                
+                // Создаем эффект клика
+                const effect = document.createElement('div');
+                effect.className = 'click-effect';
+                effect.style.left = event.clientX + 'px';
+                effect.style.top = event.clientY + 'px';
+                document.body.appendChild(effect);
+                
+                setTimeout(() => {
+                    effect.remove();
+                }, 500);
+            });
+            
+            // Обработчик покупки монет
+            buyCoinsBtn.addEventListener('click', function() {
+                if (clicks >= COIN_PRICE) {
+                    clicks -= COIN_PRICE;
+                    coins += 10;
+                    updateClicks();
+                    updateCoins();
+                    saveGame();
+                    
+                    // Анимация монетки
+                    coinsDisplay.classList.add('coin-animation');
+                    setTimeout(() => {
+                        coinsDisplay.classList.remove('coin-animation');
+                    }, 300);
+                }
+            });
+            
+            // Переключение вкладок
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    
+                    // Убираем активный класс у всех вкладок и контента
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(c => c.classList.remove('active'));
+                    
+                    // Добавляем активный класс текущей вкладке и контенту
+                    this.classList.add('active');
+                    document.getElementById(`${tabId}-tab`).classList.add('active');
+                });
+            });
+            
+            // Сброс прогресса
+            resetBtn.addEventListener('click', () => {
+                resetConfirm.style.display = 'block';
+            });
+            
+            confirmYes.addEventListener('click', () => {
+                localStorage.clear();
+                location.reload();
+            });
+            
+            confirmNo.addEventListener('click', () => {
+                resetConfirm.style.display = 'none';
+            });
+            
+            // Инициализация магазинов
+            initWeaponsShop();
+            initUpgradesShop();
+            
+            // Загрузка сохраненной игры
+            loadGame();
+            
+            // Обновление кнопок
+            updateBuyButtons();
+        });
+    </script>
+</body>
+</html>
